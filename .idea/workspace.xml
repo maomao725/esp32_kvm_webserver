@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="dd9d258d-f170-4d26-8df5-f310c7fc9405" name="更改" comment="">
+      <change beforePath="$PROJECT_DIR$/components/cjson/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/components/cjson/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/cjson/fuzzing/afl-prepare-linux.sh" beforeDir="false" afterPath="$PROJECT_DIR$/components/cjson/fuzzing/afl-prepare-linux.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/cjson/fuzzing/afl.sh" beforeDir="false" afterPath="$PROJECT_DIR$/components/cjson/fuzzing/afl.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/cjson/fuzzing/ossfuzz.sh" beforeDir="false" afterPath="$PROJECT_DIR$/components/cjson/fuzzing/ossfuzz.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/cjson/tests/unity/auto/stylize_as_junit.rb" beforeDir="false" afterPath="$PROJECT_DIR$/components/cjson/tests/unity/auto/stylize_as_junit.rb" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/components/cjson" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2zLuHBD0IVNYIoaWUthBQIJnFeR" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/30382/Desktop/esp32_kvm_webserver",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-e0ed3721d81e-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.25410.159" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="dd9d258d-f170-4d26-8df5-f310c7fc9405" name="更改" comment="" />
+      <created>1751522583801</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1751522583801</updated>
+      <workItem from="1751522584912" duration="4509000" />
+      <workItem from="1751527810853" duration="7280000" />
+      <workItem from="1751630735488" duration="335000" />
+      <workItem from="1751631207507" duration="376000" />
+      <workItem from="1751631661794" duration="511000" />
+      <workItem from="1751632198671" duration="6363000" />
+      <workItem from="1751734222288" duration="127000" />
+      <workItem from="1751906811401" duration="2381000" />
+      <workItem from="1751932288516" duration="181000" />
+      <workItem from="1752032903925" duration="1514000" />
+      <workItem from="1752034775086" duration="671000" />
+      <workItem from="1752035660578" duration="254000" />
+      <workItem from="1752036017248" duration="1103000" />
+      <workItem from="1752037215651" duration="1107000" />
+      <workItem from="1752039314693" duration="599000" />
+      <workItem from="1752067921608" duration="1995000" />
+      <workItem from="1752070153583" duration="161000" />
+      <workItem from="1752070420017" duration="553000" />
+      <workItem from="1752071011341" duration="538000" />
+      <workItem from="1752113912436" duration="35000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

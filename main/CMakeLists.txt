@@ -1,0 +1,24 @@
+idf_component_register(
+    SRCS 
+        "main.c"
+        "wifi_manager.c"
+        "web_server.c"
+        "kvm_controller.c"
+        "uart_comm.c"
+    INCLUDE_DIRS 
+        "."
+        "include"
+    EMBED_FILES
+        "web/index.html"
+        "web/style.css"
+        "web/script.js"
+        "web/favicon.ico"
+    REQUIRES
+        esp_wifi
+        esp_http_server
+        nvs_flash
+        driver
+        json  # cJSON组件名称
+        esp_netif
+        esp_timer
+)

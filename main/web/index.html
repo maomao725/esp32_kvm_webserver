@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32-S3 KVM控制器</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>🖥️ KVM控制器</h1>
+                <span class="version">v1.0</span>
+            </div>
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-label">连接状态:</span>
+                    <span id="connection-status" class="status-value offline">离线</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">当前通道:</span>
+                    <span id="current-channel" class="status-value">-</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="main">
+        <div class="container">
+            <!-- 通道控制面板 -->
+            <section class="control-panel">
+                <h2>🎛️ HDMI通道控制</h2>
+                <div class="channel-grid">
+                    <div class="channel-card" data-channel="1">
+                        <div class="channel-header">
+                            <span class="channel-number">1</span>
+                            <span class="channel-status" id="status-1">●</span>
+                        </div>
+                        <div class="channel-name" id="name-1">电脑1</div>
+                        <button class="channel-btn" onclick="switchChannel(1)">切换到电脑1</button>
+                    </div>
+
+                    <div class="channel-card" data-channel="2">
+                        <div class="channel-header">
+                            <span class="channel-number">2</span>
+                            <span class="channel-status" id="status-2">●</span>
+                        </div>
+                        <div class="channel-name" id="name-2">电脑2</div>
+                        <button class="channel-btn" onclick="switchChannel(2)">切换到电脑2</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 系统信息面板 -->
+            <section class="info-panel">
+                <div class="info-grid">
+                    <!-- 系统状态 -->
+                    <div class="info-card">
+                        <h3>📊 系统状态</h3>
+                        <div class="info-content">
+                            <div class="info-item">
+                                <span class="info-label">WiFi状态:</span>
+                                <span id="wifi-status" class="info-value">检查中...</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">IP地址:</span>
+                                <span id="ip-address" class="info-value">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">通信状态:</span>
+                                <span id="comm-status" class="info-value">检查中...</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">运行时间:</span>
+                                <span id="uptime" class="info-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 统计信息 -->
+                    <div class="info-card">
+                        <h3>📈 统计信息</h3>
+                        <div class="info-content">
+                            <div class="info-item">
+                                <span class="info-label">总切换次数:</span>
+                                <span id="total-switches" class="info-value">0</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">错误次数:</span>
+                                <span id="error-count" class="info-value">0</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">成功率:</span>
+                                <span id="success-rate" class="info-value">100%</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">最后切换:</span>
+                                <span id="last-switch" class="info-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 操作日志 -->
+            <section class="log-panel">
+                <h3>📝 操作日志</h3>
+                <div class="log-container">
+                    <div id="log-content" class="log-content">
+                        <div class="log-entry">
+                            <span class="log-time">[系统启动]</span>
+                            <span class="log-message">KVM控制器已启动，等待连接...</span>
+                        </div>
+                    </div>
+                    <div class="log-controls">
+                        <button onclick="clearLog()" class="btn-secondary">清空日志</button>
+                        <button onclick="refreshStatus()" class="btn-primary">刷新状态</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 底部信息 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 ESP32-S3 KVM控制器 | 基于AI智能识别的便捷式KVM | 
+               <a href="#" onclick="showAbout()">关于</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- 加载提示 -->
+    <div id="loading" class="loading hidden">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">处理中...</div>
+    </div>
+
+    <!-- 消息提示 -->
+    <div id="message" class="message hidden">
+        <div class="message-content">
+            <span id="message-text"></span>
+            <button onclick="hideMessage()" class="message-close">×</button>
+        </div>
+    </div>
+
+    <!-- 关于对话框 -->
+    <div id="about-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>关于 ESP32-S3 KVM控制器</h3>
+                <button onclick="hideAbout()" class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>版本:</strong> v1.0</p>
+                <p><strong>芯片:</strong> ESP32-S3</p>
+                <p><strong>功能:</strong> 2路HDMI通道切换控制</p>
+                <p><strong>通信:</strong> UART协议与CH32V003通信</p>
+                <p><strong>开发:</strong> 基于ESP-IDF框架</p>
+                <p><strong>快捷键:</strong> 按数字键1-2快速切换通道</p>
+                <br>
+                <p>这是一个基于AI智能识别的便捷式KVM控制系统，通过网页界面实现远程2路HDMI通道切换控制。</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
