@@ -134,12 +134,17 @@ esp_err_t uart_comm_switch_channel(int channel)
     int bytes_sent = uart_write_bytes(UART_PORT_NUM, (const char *)command_to_send, command_size);
     
     // 确保数据发送完成
-    uart_wait_tx_done(UART_PORT_NUM, pdMS_TO_TICKS(1000));
+    esp_err_t wait_result = uart_wait_tx_done(UART_PORT_NUM, pdMS_TO_TICKS(1000));
+    if (wait_result != ESP_OK) {
+        ESP_LOGW(TAG, "UART发送等待超时: %s", esp_err_to_name(wait_result));
+    }
 
     xSemaphoreGive(uart_mutex);
 
     if (bytes_sent == command_size) {
         ESP_LOGI(TAG, "✓ UART成功发送通道%d切换命令 (%d字节)", channel, bytes_sent);
+        // 额外验证：再次打印发送的校验和
+        ESP_LOGI(TAG, "发送的校验和: 0x%02X", command_to_send[20]);
         return ESP_OK;
     } else {
         ESP_LOGE(TAG, "✗ UART发送失败 通道%d: 实际发送%d/%d字节", channel, bytes_sent, command_size);

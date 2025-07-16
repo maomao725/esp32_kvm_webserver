@@ -230,6 +230,8 @@ async function switchChannel(channel) {
             updateChannelDisplay();
             showMessage(`成功切换到通道 ${channel}`, 'success');
             addLog('操作', `成功切换到通道 ${channel}`);
+            // 立即更新一次状态以确保显示最新信息
+            updateSystemStatus();
         } else {
             // 切换失败
             showMessage(`切换失败: ${result.message}`, 'error');
