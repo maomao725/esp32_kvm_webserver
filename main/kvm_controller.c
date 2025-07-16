@@ -78,11 +78,11 @@ esp_err_t kvm_controller_switch_channel(int channel)
         return ESP_ERR_TIMEOUT;
     }
 
-    // 删除切换尝试的调试信息
+    ESP_LOGI(TAG, "开始切换到通道 %d (当前通道: %d)", channel, s_kvm_status.current_channel);
 
     // 如果已经是目标通道，则不执行任何操作
     if (s_kvm_status.current_channel == channel) {
-        // 已经是目标通道
+        ESP_LOGI(TAG, "已经是目标通道 %d，无需切换", channel);
         xSemaphoreGive(s_kvm_mutex);
         return ESP_OK;
     }
@@ -91,6 +91,7 @@ esp_err_t kvm_controller_switch_channel(int channel)
     s_kvm_status.target_channel = channel;
     s_kvm_status.switch_status = KVM_SWITCH_IN_PROGRESS;
 
+    ESP_LOGI(TAG, "调用UART发送切换命令到通道 %d", channel);
     // 通过UART发送切换命令
     esp_err_t ret = uart_comm_switch_channel(channel);
 
@@ -121,10 +122,10 @@ esp_err_t kvm_controller_switch_channel(int channel)
     s_kvm_status.switch_status = KVM_SWITCH_SUCCESS;
     s_kvm_status.communication_ok = true;
 
-    // 删除切换成功的调试信息
+    ESP_LOGI(TAG, "✓ 通道切换完成: %d -> %d", s_kvm_status.current_channel, channel);
 
     xSemaphoreGive(s_kvm_mutex);
-    return ret; // 总是返回成功
+    return ESP_OK;
 }
 
 /**
