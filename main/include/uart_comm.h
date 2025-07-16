@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 // UART配置参数
-#define UART_PORT_NUM           UART_NUM_1
+#define UART_PORT_NUM           UART_NUM_0
 #define UART_BAUD_RATE          9600
 #define UART_DATA_BITS          UART_DATA_8_BITS
 #define UART_PARITY             UART_PARITY_DISABLE
@@ -24,8 +24,8 @@ extern "C" {
 #define UART_FLOW_CTRL          UART_HW_FLOWCTRL_DISABLE
 
 // GPIO引脚定义 (ESP32-S3适配)
-#define UART_TX_PIN             GPIO_NUM_17  // UART1 TX
-#define UART_RX_PIN             GPIO_NUM_18  // UART1 RX  
+#define UART_TX_PIN             GPIO_NUM_43  // UART0 TX (USB调试口)
+#define UART_RX_PIN             GPIO_NUM_44  // UART0 RX (USB调试口)  
 #define UART_RTS_PIN            UART_PIN_NO_CHANGE
 #define UART_CTS_PIN            UART_PIN_NO_CHANGE
 

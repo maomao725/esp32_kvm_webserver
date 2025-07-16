@@ -89,14 +89,14 @@ esp_err_t uart_comm_switch_channel(int channel)
     // 定义切换成功响应格式 (根据协议文档)
     // 格式: [起始字节][响应状态][数据长度][当前通道][数据填充15字节][校验和][结束字节]
     uint8_t response_data[21] = {
-        0xBB,                                                           // 起始字节
-        0x00,                                                           // 响应状态 (成功)
-        0x01,                                                           // 数据长度 (1字节)
-        (uint8_t)channel,                                               // 当前通道号
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,               // 数据填充 (8字节)
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                     // 数据填充 (7字节)
-        0x00,                                                           // 校验和 (待计算)
-        0x66                                                            // 结束字节
+        0xBB,                                                           // 索引0: 起始字节
+        0x00,                                                           // 索引1: 响应状态 (成功)
+        0x01,                                                           // 索引2: 数据长度 (1字节)
+        (uint8_t)channel,                                               // 索引3: 当前通道号
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,               // 索引4-11: 数据填充 (8字节)
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                     // 索引12-18: 数据填充 (7字节)
+        0x00,                                                           // 索引19: 校验和 (待计算)
+        0x66                                                            // 索引20: 结束字节
     };
     
     // 根据协议图片计算校验和
@@ -114,7 +114,7 @@ esp_err_t uart_comm_switch_channel(int channel)
             checksum += response_data[i];
         }
     }
-    response_data[20] = checksum;
+    response_data[19] = checksum;
 
     const uint8_t *command_to_send = response_data;
     const int command_size = 21; // 明确指定21字节
@@ -123,6 +123,33 @@ esp_err_t uart_comm_switch_channel(int channel)
 
     // 打印要发送的数据（用于调试）
     ESP_LOG_BUFFER_HEX(TAG, command_to_send, command_size);
+    
+    // 验证数据格式的详细输出
+    printf("预期hex数据: ");
+    for(int i = 0; i < command_size; i++) {
+        printf("%02X ", command_to_send[i]);
+    }
+    printf("\n");
+    
+    // 打印人类可读的数据格式
+    ESP_LOGI(TAG, "数据格式解析:");
+    ESP_LOGI(TAG, "  起始字节: 0x%02X", command_to_send[0]);
+    ESP_LOGI(TAG, "  响应状态: 0x%02X", command_to_send[1]);
+    ESP_LOGI(TAG, "  数据长度: 0x%02X", command_to_send[2]);
+    ESP_LOGI(TAG, "  当前通道: 0x%02X (%d)", command_to_send[3], command_to_send[3]);
+    ESP_LOGI(TAG, "  校验和: 0x%02X", command_to_send[19]);
+    ESP_LOGI(TAG, "  结束字节: 0x%02X", command_to_send[20]);
+    ESP_LOGI(TAG, "数据应该在串口助手中显示为二进制数据，这是正常的！");
+    
+    // 如果需要测试，可以发送一个简单的文本消息
+    // 取消注释下面的代码来发送文本而不是二进制数据
+    /*
+    char test_message[64];
+    snprintf(test_message, sizeof(test_message), "KVM_SWITCH_CH%d_OK\r\n", channel);
+    ESP_LOGI(TAG, "发送测试文本: %s", test_message);
+    uart_write_bytes(UART_PORT_NUM, test_message, strlen(test_message));
+    return ESP_OK;
+    */
 
     if (uart_mutex == NULL) {
         ESP_LOGE(TAG, "UART互斥锁未初始化");
@@ -154,7 +181,7 @@ esp_err_t uart_comm_switch_channel(int channel)
     if (bytes_sent == command_size) {
         ESP_LOGI(TAG, "✓ UART成功发送通道%d切换响应 (%d字节)", channel, bytes_sent);
         // 额外验证：再次打印发送的校验和
-        ESP_LOGI(TAG, "发送的校验和: 0x%02X", command_to_send[20]);
+        ESP_LOGI(TAG, "发送的校验和: 0x%02X", command_to_send[19]);
         return ESP_OK;
     } else {
         ESP_LOGE(TAG, "✗ UART发送失败 通道%d: 实际发送%d/%d字节", channel, bytes_sent, command_size);
@@ -195,5 +222,5 @@ bool uart_comm_is_connected(void)
  */
 void uart_comm_reset_status(void)
 {
-    ;// 无操作
+    // 无操作
 }

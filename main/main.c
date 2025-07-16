@@ -154,7 +154,10 @@ void app_main(void)
     wifi_manager_init();
 
     // 启动Web服务器
-    web_server_start();
+    esp_err_t web_ret = web_server_start();
+    if (web_ret != ESP_OK) {
+        ESP_LOGE(TAG, "Web服务器启动失败: %s", esp_err_to_name(web_ret));
+    }
     
     // 创建状态LED任务
     xTaskCreate(status_led_task, "status_led", 2048, NULL, 5, NULL);
