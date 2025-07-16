@@ -21,12 +21,12 @@ static SemaphoreHandle_t uart_mutex = NULL;
  */
 esp_err_t uart_comm_init(void)
 {
-    // UART通信初始化
+    ESP_LOGI(TAG, "开始初始化UART通信...");
 
     // 创建互斥锁
     uart_mutex = xSemaphoreCreateMutex();
     if (uart_mutex == NULL) {
-        ESP_LOGE(TAG, "Failed to create UART mutex");
+        ESP_LOGE(TAG, "创建UART互斥锁失败");
         return ESP_FAIL;
     }
 
@@ -40,18 +40,13 @@ esp_err_t uart_comm_init(void)
         .source_clk = UART_SCLK_DEFAULT,
     };
 
-    // 安装UART驱动
-    esp_err_t ret = uart_driver_install(UART_PORT_NUM, UART_RX_BUFFER_SIZE,
-                                       UART_TX_BUFFER_SIZE, 0, NULL, 0);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to install UART driver: %s", esp_err_to_name(ret));
-        return ret;
-    }
+    ESP_LOGI(TAG, "UART配置: 端口=%d, 波特率=%d, TX引脚=%d, RX引脚=%d", 
+             UART_PORT_NUM, UART_BAUD_RATE, UART_TX_PIN, UART_RX_PIN);
 
-    // 配置UART参数
-    ret = uart_param_config(UART_PORT_NUM, &uart_config);
+    // 先配置UART参数
+    esp_err_t ret = uart_param_config(UART_PORT_NUM, &uart_config);
     if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to configure UART parameters: %s", esp_err_to_name(ret));
+        ESP_LOGE(TAG, "配置UART参数失败: %s", esp_err_to_name(ret));
         return ret;
     }
 
@@ -59,12 +54,22 @@ esp_err_t uart_comm_init(void)
     ret = uart_set_pin(UART_PORT_NUM, UART_TX_PIN, UART_RX_PIN,
                       UART_RTS_PIN, UART_CTS_PIN);
     if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to set UART pins: %s", esp_err_to_name(ret));
+        ESP_LOGE(TAG, "设置UART引脚失败: %s", esp_err_to_name(ret));
         return ret;
     }
 
-    // UART通信初始化完成，无需调试信息
+    // 安装UART驱动
+    ret = uart_driver_install(UART_PORT_NUM, UART_RX_BUFFER_SIZE,
+                             UART_TX_BUFFER_SIZE, 0, NULL, 0);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "安装UART驱动失败: %s", esp_err_to_name(ret));
+        return ret;
+    }
 
+    // 清空缓冲区
+    uart_flush(UART_PORT_NUM);
+
+    ESP_LOGI(TAG, "✓ UART通信初始化完成");
     return ESP_OK;
 }
 
