@@ -24,8 +24,8 @@ extern "C" {
 #define UART_FLOW_CTRL          UART_HW_FLOWCTRL_DISABLE
 
 // GPIO引脚定义 (ESP32-S3适配)
-#define UART_TX_PIN             GPIO_NUM_43  // UART0 TX (USB调试口)
-#define UART_RX_PIN             GPIO_NUM_44  // UART0 RX (USB调试口)  
+#define UART_TX_PIN             GPIO_NUM_1   // UART0 TX (连接CH32V003)
+#define UART_RX_PIN             GPIO_NUM_3   // UART0 RX (连接CH32V003)  
 #define UART_RTS_PIN            UART_PIN_NO_CHANGE
 #define UART_CTS_PIN            UART_PIN_NO_CHANGE
 
