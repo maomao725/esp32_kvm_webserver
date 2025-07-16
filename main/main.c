@@ -145,7 +145,7 @@ void app_main(void)
     init_status_led();
 
     // 初始化UART通信
-    uart_comm_init();
+    ESP_ERROR_CHECK(uart_comm_init());
 
     // 初始化KVM控制器
     kvm_controller_init();
