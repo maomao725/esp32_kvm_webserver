@@ -118,6 +118,11 @@ esp_err_t uart_comm_switch_channel(int channel)
     // 打印要发送的数据（用于调试）
     ESP_LOG_BUFFER_HEX(TAG, command_to_send, command_size);
 
+    if (uart_mutex == NULL) {
+        ESP_LOGE(TAG, "UART互斥锁未初始化");
+        return ESP_ERR_INVALID_STATE;
+    }
+
     if (xSemaphoreTake(uart_mutex, pdMS_TO_TICKS(1000)) != pdTRUE) {
         ESP_LOGE(TAG, "获取UART互斥锁失败");
         return ESP_ERR_TIMEOUT;
