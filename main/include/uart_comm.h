@@ -23,9 +23,9 @@ extern "C" {
 #define UART_STOP_BITS          UART_STOP_BITS_1
 #define UART_FLOW_CTRL          UART_HW_FLOWCTRL_DISABLE
 
-// GPIO引脚定义
-#define UART_TX_PIN             GPIO_NUM_17
-#define UART_RX_PIN             GPIO_NUM_18
+// GPIO引脚定义 (ESP32-S3适配)
+#define UART_TX_PIN             GPIO_NUM_17  // UART1 TX
+#define UART_RX_PIN             GPIO_NUM_18  // UART1 RX  
 #define UART_RTS_PIN            UART_PIN_NO_CHANGE
 #define UART_CTS_PIN            UART_PIN_NO_CHANGE
 
