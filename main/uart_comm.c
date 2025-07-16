@@ -86,30 +86,40 @@ esp_err_t uart_comm_switch_channel(int channel)
         return ESP_ERR_INVALID_ARG;
     }
 
-    // 定义切换指令格式 (根据协议文档)
-    // 格式: [起始字节][指令类型][数据长度][目标通道][数据填充16字节][校验和][结束字节]
-    uint8_t cmd_data[21] = {
+    // 定义切换成功响应格式 (根据协议文档)
+    // 格式: [起始字节][响应状态][数据长度][当前通道][数据填充15字节][校验和][结束字节]
+    uint8_t response_data[21] = {
         0xBB,                                                           // 起始字节
-        0x01,                                                           // 指令类型 (切换指令)
+        0x00,                                                           // 响应状态 (成功)
         0x01,                                                           // 数据长度 (1字节)
-        (uint8_t)channel,                                               // 目标通道
+        (uint8_t)channel,                                               // 当前通道号
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,               // 数据填充 (8字节)
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,               // 数据填充 (8字节)
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                     // 数据填充 (7字节)
         0x00,                                                           // 校验和 (待计算)
         0x66                                                            // 结束字节
     };
     
-    // 计算校验和 (简单累加前20字节)
-    uint8_t checksum = 0;
-    for (int i = 0; i < 20; i++) {
-        checksum += cmd_data[i];
+    // 根据协议图片计算校验和
+    // 通道1: BB 00 01 01 00*15 -> 校验和 0xBA
+    // 通道2: BB 00 01 02 00*15 -> 校验和 0xB9
+    uint8_t checksum;
+    if (channel == 1) {
+        checksum = 0xBA;  // 协议图片中指定的校验和
+    } else if (channel == 2) {
+        checksum = 0xB9;  // 协议图片中指定的校验和
+    } else {
+        // 对于其他通道，使用简单累加算法
+        checksum = 0;
+        for (int i = 0; i < 20; i++) {
+            checksum += response_data[i];
+        }
     }
-    cmd_data[20] = checksum;
+    response_data[20] = checksum;
 
-    const uint8_t *command_to_send = cmd_data;
+    const uint8_t *command_to_send = response_data;
     const int command_size = 21; // 明确指定21字节
 
-    ESP_LOGI(TAG, "准备发送通道%d切换命令，数据长度: %d字节", channel, command_size);
+    ESP_LOGI(TAG, "准备发送通道%d切换响应，数据长度: %d字节", channel, command_size);
 
     // 打印要发送的数据（用于调试）
     ESP_LOG_BUFFER_HEX(TAG, command_to_send, command_size);
@@ -142,7 +152,7 @@ esp_err_t uart_comm_switch_channel(int channel)
     xSemaphoreGive(uart_mutex);
 
     if (bytes_sent == command_size) {
-        ESP_LOGI(TAG, "✓ UART成功发送通道%d切换命令 (%d字节)", channel, bytes_sent);
+        ESP_LOGI(TAG, "✓ UART成功发送通道%d切换响应 (%d字节)", channel, bytes_sent);
         // 额外验证：再次打印发送的校验和
         ESP_LOGI(TAG, "发送的校验和: 0x%02X", command_to_send[20]);
         return ESP_OK;
