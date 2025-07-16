@@ -27,10 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 初始化连接状态 (HTTP模式)
     initWebSocket();
     
-    // 开始状态更新
-    startStatusUpdate();
-    
-    // 启动轮询模式
+    // 启动轮询模式（包含状态更新）
     startPollingMode();
     
     // 初始化界面
@@ -276,58 +273,7 @@ async function refreshStatus() {
     }
 }
 
-/**
- * 更新系统状态显示
- */
-function updateSystemStatus(data) {
-    // 更新当前通道
-    if (data.current_channel) {
-        currentChannel = data.current_channel;
-        updateChannelDisplay();
-    }
-    
-    // 更新WiFi状态
-    if (data.wifi_status) {
-        document.getElementById('wifi-status').textContent = 
-            data.wifi_status.connected ? '已连接' : '未连接';
-    }
-    
-    // 更新IP地址
-    if (data.ip_address) {
-        document.getElementById('ip-address').textContent = data.ip_address;
-    }
-    
-    // 更新通信状态
-    if (data.comm_status) {
-        document.getElementById('comm-status').textContent = 
-            data.comm_status.connected ? '正常' : '断开';
-    }
-    
-    // 更新统计信息
-    if (data.stats) {
-        document.getElementById('total-switches').textContent = data.stats.total_switches || 0;
-        document.getElementById('error-count').textContent = data.stats.error_count || 0;
-        
-        const successRate = data.stats.total_switches > 0 ? 
-            ((data.stats.total_switches - data.stats.error_count) / data.stats.total_switches * 100).toFixed(1) : 100;
-        document.getElementById('success-rate').textContent = `${successRate}%`;
-        
-        if (data.stats.last_switch_time) {
-            const lastSwitch = new Date(data.stats.last_switch_time * 1000);
-            document.getElementById('last-switch').textContent = lastSwitch.toLocaleString();
-        }
-    }
-    
-    // 更新运行时间
-    if (data.uptime) {
-        document.getElementById('uptime').textContent = formatUptime(data.uptime);
-    }
-    
-    // 更新通道状态
-    if (data.channels) {
-        updateChannelStatus(data.channels);
-    }
-}
+
 
 /**
  * 更新通道显示
