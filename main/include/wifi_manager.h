@@ -25,8 +25,8 @@ extern "C" {
 #define DEFAULT_AP_MAX_CONN     4
 
 // 默认STA配置 - 请修改为您的WiFi信息
-#define DEFAULT_STA_SSID        "AKA.L"     // WiFi名称
-#define DEFAULT_STA_PASSWORD    "konggeshinbsp" // WiFi密码
+#define DEFAULT_STA_SSID        "maomao"     // WiFi名称
+#define DEFAULT_STA_PASSWORD    "y20050725" // WiFi密码
 
 // WiFi状态
 typedef struct {

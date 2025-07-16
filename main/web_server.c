@@ -359,9 +359,16 @@ esp_err_t web_server_start(void)
     config.stack_size = WEB_SERVER_STACK_SIZE;
     config.task_priority = 5;
     config.lru_purge_enable = true;
+    config.max_uri_handlers = 16;
+    config.max_resp_headers = 8;
+    config.backlog_conn = 5;
+    config.recv_wait_timeout = 10;
+    config.send_wait_timeout = 10;
 
-    if (httpd_start(&server, &config) == ESP_OK) {
-        // Web服务器启动成功
+    ESP_LOGI(TAG, "正在启动Web服务器，端口: %d", config.server_port);
+    esp_err_t ret = httpd_start(&server, &config);
+    if (ret == ESP_OK) {
+        ESP_LOGI(TAG, "✓ Web服务器启动成功，监听端口: %d", config.server_port);
 
         // 注册静态文件处理器
         httpd_uri_t index_uri = {
@@ -457,10 +464,11 @@ esp_err_t web_server_start(void)
         // WebSocket功能已禁用，跳过注册
 
         // URI处理器注册完成
+        ESP_LOGI(TAG, "✓ 所有URI处理器注册完成");
         return ESP_OK;
     } else {
-        ESP_LOGE(TAG, "Web服务器启动失败");
-        return ESP_FAIL;
+        ESP_LOGE(TAG, "✗ Web服务器启动失败: %s", esp_err_to_name(ret));
+        return ret;
     }
 }
 

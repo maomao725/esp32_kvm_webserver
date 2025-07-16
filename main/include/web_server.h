@@ -15,8 +15,8 @@ extern "C" {
 
 // 服务器配置
 #define WEB_SERVER_PORT         80
-#define WEB_SERVER_MAX_CLIENTS  10
-#define WEB_SERVER_STACK_SIZE   8192
+#define WEB_SERVER_MAX_CLIENTS  7
+#define WEB_SERVER_STACK_SIZE   6144
 
 // API路径定义
 #define API_ROOT                "/api"
