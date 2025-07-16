@@ -77,6 +77,7 @@ esp_err_t uart_comm_init(void)
 esp_err_t uart_comm_switch_channel(int channel)
 {
     if (channel < 1 || channel > 2) {
+        ESP_LOGE(TAG, "无效通道号: %d", channel);
         return ESP_ERR_INVALID_ARG;
     }
 
@@ -85,26 +86,37 @@ esp_err_t uart_comm_switch_channel(int channel)
     const uint8_t cmd_ch2[] = {0xBB, 0x00, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xB9, 0x66};
 
     const uint8_t *command_to_send = (channel == 1) ? cmd_ch1 : cmd_ch2;
-    const int command_size = sizeof(cmd_ch1);
+    const int command_size = 21; // 明确指定21字节
+
+    ESP_LOGI(TAG, "准备发送通道%d切换命令，数据长度: %d字节", channel, command_size);
+
+    // 打印要发送的数据（用于调试）
+    ESP_LOG_BUFFER_HEX(TAG, command_to_send, command_size);
 
     if (xSemaphoreTake(uart_mutex, pdMS_TO_TICKS(1000)) != pdTRUE) {
-        ESP_LOGE(TAG, "Failed to acquire UART mutex");
+        ESP_LOGE(TAG, "获取UART互斥锁失败");
         return ESP_ERR_TIMEOUT;
     }
 
-    // 清空接收缓冲区 (以防有干扰数据)
+    // 清空发送和接收缓冲区
     uart_flush(UART_PORT_NUM);
+    
+    // 等待UART准备就绪
+    uart_wait_tx_done(UART_PORT_NUM, pdMS_TO_TICKS(100));
 
     // 发送指令
     int bytes_sent = uart_write_bytes(UART_PORT_NUM, (const char *)command_to_send, command_size);
+    
+    // 确保数据发送完成
+    uart_wait_tx_done(UART_PORT_NUM, pdMS_TO_TICKS(1000));
 
     xSemaphoreGive(uart_mutex);
 
     if (bytes_sent == command_size) {
-        ESP_LOGI(TAG, "UART发送通道%d切换命令 (21字节)", channel);
+        ESP_LOGI(TAG, "✓ UART成功发送通道%d切换命令 (%d字节)", channel, bytes_sent);
         return ESP_OK;
     } else {
-        ESP_LOGE(TAG, "UART发送失败 通道%d: 发送%d/%d字节", channel, bytes_sent, command_size);
+        ESP_LOGE(TAG, "✗ UART发送失败 通道%d: 实际发送%d/%d字节", channel, bytes_sent, command_size);
         return ESP_FAIL;
     }
 }

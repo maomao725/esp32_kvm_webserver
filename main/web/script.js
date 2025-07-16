@@ -30,6 +30,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // 开始状态更新
     startStatusUpdate();
     
+    // 启动轮询模式
+    startPollingMode();
+    
     // 初始化界面
     updateUI();
     
@@ -73,32 +76,80 @@ function updateSystemStatus() {
         .then(response => response.json())
         .then(data => {
             if (data.code === 0) {
-                // 更新当前通道
-                if (data.data.current_channel !== undefined) {
-                    currentChannel = data.data.current_channel;
-                    updateChannelDisplay();
+                // 确保连接状态为在线
+                if (!isConnected) {
+                    isConnected = true;
+                    updateConnectionStatus(true);
+                    addLog('系统', '连接已恢复');
                 }
 
-                // 更新通信状态
-                if (data.data.comm_status) {
-                    const commStatus = data.data.comm_status.connected ? '正常' : '断开';
-                    const statusElement = document.getElementById('comm-status');
-                    if (statusElement) {
-                        statusElement.textContent = commStatus;
-                        statusElement.className = data.data.comm_status.connected ? 'status-connected' : 'status-disconnected';
-                    }
-                }
-
-                // 更新统计信息
-                if (data.data.stats) {
-                    updateStatsDisplay(data.data.stats);
-                }
+                // 更新完整的系统状态
+                updateSystemStatusDisplay(data.data);
             }
         })
         .catch(error => {
             console.error('状态更新失败:', error);
-            // 不显示错误日志，避免刷屏
+            // 连接失败时更新状态
+            if (isConnected) {
+                isConnected = false;
+                updateConnectionStatus(false);
+                addLog('错误', '连接已断开');
+            }
         });
+}
+
+/**
+ * 更新系统状态显示（从轮询数据）
+ */
+function updateSystemStatusDisplay(data) {
+    // 更新当前通道
+    if (data.current_channel !== undefined) {
+        currentChannel = data.current_channel;
+        updateChannelDisplay();
+    }
+
+    // 更新WiFi状态
+    if (data.wifi_status) {
+        const wifiElement = document.getElementById('wifi-status');
+        if (wifiElement) {
+            wifiElement.textContent = data.wifi_status.connected ? '已连接' : '未连接';
+        }
+    }
+
+    // 更新IP地址
+    if (data.ip_address) {
+        const ipElement = document.getElementById('ip-address');
+        if (ipElement) {
+            ipElement.textContent = data.ip_address;
+        }
+    }
+
+    // 更新通信状态
+    if (data.comm_status) {
+        const commStatus = data.comm_status.connected ? '正常' : '断开';
+        const statusElement = document.getElementById('comm-status');
+        if (statusElement) {
+            statusElement.textContent = commStatus;
+        }
+    }
+
+    // 更新运行时间
+    if (data.uptime) {
+        const uptimeElement = document.getElementById('uptime');
+        if (uptimeElement) {
+            uptimeElement.textContent = formatUptime(data.uptime);
+        }
+    }
+
+    // 更新统计信息
+    if (data.stats) {
+        updateStatsDisplay(data.stats);
+    }
+
+    // 更新通道状态
+    if (data.channels) {
+        updateChannelStatus(data.channels);
+    }
 }
 
 /**
