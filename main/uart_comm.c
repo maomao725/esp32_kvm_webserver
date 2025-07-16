@@ -88,29 +88,25 @@ esp_err_t uart_comm_switch_channel(int channel)
 
     // 定义切换指令格式 (根据协议文档)
     // 格式: [起始字节][指令类型][数据长度][目标通道][数据填充16字节][校验和][结束字节]
-    const uint8_t cmd_ch1[] = {
+    uint8_t cmd_data[21] = {
         0xBB,                                                           // 起始字节
         0x01,                                                           // 指令类型 (切换指令)
         0x01,                                                           // 数据长度 (1字节)
-        0x01,                                                           // 目标通道1
+        (uint8_t)channel,                                               // 目标通道
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,               // 数据填充 (8字节)
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,               // 数据填充 (8字节)
-        0xBE,                                                           // 校验和 (计算得出)
+        0x00,                                                           // 校验和 (待计算)
         0x66                                                            // 结束字节
     };
     
-    const uint8_t cmd_ch2[] = {
-        0xBB,                                                           // 起始字节
-        0x01,                                                           // 指令类型 (切换指令)
-        0x01,                                                           // 数据长度 (1字节)
-        0x02,                                                           // 目标通道2
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,               // 数据填充 (8字节)
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,               // 数据填充 (8字节)
-        0xBD,                                                           // 校验和 (计算得出)
-        0x66                                                            // 结束字节
-    };
+    // 计算校验和 (简单累加前20字节)
+    uint8_t checksum = 0;
+    for (int i = 0; i < 20; i++) {
+        checksum += cmd_data[i];
+    }
+    cmd_data[20] = checksum;
 
-    const uint8_t *command_to_send = (channel == 1) ? cmd_ch1 : cmd_ch2;
+    const uint8_t *command_to_send = cmd_data;
     const int command_size = 21; // 明确指定21字节
 
     ESP_LOGI(TAG, "准备发送通道%d切换命令，数据长度: %d字节", channel, command_size);
