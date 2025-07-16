@@ -45,9 +45,10 @@ document.addEventListener('DOMContentLoaded', function() {
 function initWebSocket() {
     // WebSocket功能已禁用
     console.log('WebSocket功能已禁用，使用HTTP轮询模式');
-    isConnected = true; // 直接设置为连接状态
-    updateConnectionStatus(true);
-    addLog('系统', '系统已连接 (HTTP模式)');
+    // 不直接设置连接状态，让后续的状态检查来确定
+    isConnected = false;
+    updateConnectionStatus(false);
+    addLog('系统', '正在检查连接状态...');
 }
 
 /**
