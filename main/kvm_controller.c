@@ -122,7 +122,8 @@ esp_err_t kvm_controller_switch_channel(int channel)
     s_kvm_status.switch_status = KVM_SWITCH_SUCCESS;
     s_kvm_status.communication_ok = true;
 
-    ESP_LOGI(TAG, "✓ 通道切换完成: %d -> %d", s_kvm_status.current_channel, channel);
+    ESP_LOGI(TAG, "✓ 通道切换完成: %d -> %d (总切换次数: %d)", 
+             s_kvm_status.current_channel, channel, s_kvm_status.total_switches);
 
     xSemaphoreGive(s_kvm_mutex);
     return ESP_OK;
