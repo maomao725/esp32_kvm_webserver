@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+#include <stdarg.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
@@ -24,8 +25,19 @@
 #include "web_server.h"
 #include "kvm_controller.h"
 #include "uart_comm.h"
+#include "driver/uart.h"
 
 static const char *TAG = "KVM_MAIN";
+
+// 自定义printf函数，重定向到UART1 (GPIO17/18)
+static int uart1_vprintf(const char *format, va_list args) {
+    char buffer[512];
+    int len = vsnprintf(buffer, sizeof(buffer), format, args);
+    if (len > 0) {
+        uart_write_bytes(UART_NUM_1, buffer, len);
+    }
+    return len;
+}
 
 // 系统状态LED
 #define STATUS_LED_GPIO     GPIO_NUM_2
@@ -143,6 +155,24 @@ void app_main(void)
 
     // 初始化状态LED
     init_status_led();
+    
+    // 配置调试日志输出到GPIO17/18 (UART1)
+    uart_config_t uart_config = {
+        .baud_rate = 115200,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .source_clk = UART_SCLK_DEFAULT,
+    };
+    
+    // 配置UART1用于调试日志输出
+    ESP_ERROR_CHECK(uart_param_config(UART_NUM_1, &uart_config));
+    ESP_ERROR_CHECK(uart_set_pin(UART_NUM_1, GPIO_NUM_17, GPIO_NUM_18, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+    ESP_ERROR_CHECK(uart_driver_install(UART_NUM_1, 1024, 1024, 0, NULL, 0));
+    
+    // 重定向console输出到UART1
+    esp_log_set_vprintf(uart1_vprintf);
 
     // 初始化UART通信
     ESP_ERROR_CHECK(uart_comm_init());

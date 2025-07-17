@@ -119,27 +119,7 @@ esp_err_t uart_comm_switch_channel(int channel)
     const uint8_t *command_to_send = response_data;
     const int command_size = 21; // 明确指定21字节
 
-    ESP_LOGI(TAG, "准备发送通道%d切换响应，数据长度: %d字节", channel, command_size);
-
-    // 打印要发送的数据（用于调试）
-    ESP_LOG_BUFFER_HEX(TAG, command_to_send, command_size);
-    
-    // 验证数据格式的详细输出
-    printf("预期hex数据: ");
-    for(int i = 0; i < command_size; i++) {
-        printf("%02X ", command_to_send[i]);
-    }
-    printf("\n");
-    
-    // 打印人类可读的数据格式
-    ESP_LOGI(TAG, "数据格式解析:");
-    ESP_LOGI(TAG, "  起始字节: 0x%02X", command_to_send[0]);
-    ESP_LOGI(TAG, "  响应状态: 0x%02X", command_to_send[1]);
-    ESP_LOGI(TAG, "  数据长度: 0x%02X", command_to_send[2]);
-    ESP_LOGI(TAG, "  当前通道: 0x%02X (%d)", command_to_send[3], command_to_send[3]);
-    ESP_LOGI(TAG, "  校验和: 0x%02X", command_to_send[19]);
-    ESP_LOGI(TAG, "  结束字节: 0x%02X", command_to_send[20]);
-    ESP_LOGI(TAG, "数据应该在串口助手中显示为二进制数据，这是正常的！");
+    // 纯净发送21位KVM控制数据到CH32V003
     
     // 如果需要测试，可以发送一个简单的文本消息
     // 取消注释下面的代码来发送文本而不是二进制数据
@@ -179,12 +159,9 @@ esp_err_t uart_comm_switch_channel(int channel)
     xSemaphoreGive(uart_mutex);
 
     if (bytes_sent == command_size) {
-        ESP_LOGI(TAG, "✓ UART成功发送通道%d切换响应 (%d字节)", channel, bytes_sent);
-        // 额外验证：再次打印发送的校验和
-        ESP_LOGI(TAG, "发送的校验和: 0x%02X", command_to_send[19]);
         return ESP_OK;
     } else {
-        ESP_LOGE(TAG, "✗ UART发送失败 通道%d: 实际发送%d/%d字节", channel, bytes_sent, command_size);
+        ESP_LOGE(TAG, "UART发送失败 通道%d: %d/%d字节", channel, bytes_sent, command_size);
         return ESP_FAIL;
     }
 }
