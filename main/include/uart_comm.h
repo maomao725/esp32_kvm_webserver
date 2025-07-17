@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-// UART配置参数
+// UART配置参数 - 使用UART0的默认引脚（TX0/RX0丝印）
 #define UART_PORT_NUM           UART_NUM_0
 #define UART_BAUD_RATE          9600
 #define UART_DATA_BITS          UART_DATA_8_BITS
@@ -23,9 +23,9 @@ extern "C" {
 #define UART_STOP_BITS          UART_STOP_BITS_1
 #define UART_FLOW_CTRL          UART_HW_FLOWCTRL_DISABLE
 
-// GPIO引脚定义 (ESP32-S3适配)
-#define UART_TX_PIN             GPIO_NUM_1   // UART0 TX (连接CH32V003)
-#define UART_RX_PIN             GPIO_NUM_3   // UART0 RX (连接CH32V003)  
+// GPIO引脚定义 - 使用ESP32-S3的UART0默认引脚（TX0/RX0丝印）
+#define UART_TX_PIN             UART_PIN_NO_CHANGE  // 使用默认TX0引脚
+#define UART_RX_PIN             UART_PIN_NO_CHANGE  // 使用默认RX0引脚  
 #define UART_RTS_PIN            UART_PIN_NO_CHANGE
 #define UART_CTS_PIN            UART_PIN_NO_CHANGE
 
